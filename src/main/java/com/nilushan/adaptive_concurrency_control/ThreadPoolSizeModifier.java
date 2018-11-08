@@ -48,32 +48,32 @@ public class ThreadPoolSizeModifier implements Runnable {
 						+ currentInProgressCount + ", " + currentMeanLatency + ", " + current99PLatency); // Log metrics
 
 ///// Throughput optimized //////////////
-		if (currentTenSecondRate - oldTenSecondRate >= oldTenSecondRate * 1 / 100) {
+		if (currentTenSecondRate - oldTenSecondRate >= oldTenSecondRate * 5 / 100) {
 			threadPool.incrementPoolSizeBy(10);
 		}
 
-		if (oldTenSecondRate - currentTenSecondRate >= oldTenSecondRate * 1 / 100) {
+		if (oldTenSecondRate - currentTenSecondRate >= oldTenSecondRate * 5 / 100) {
 			threadPool.decrementPoolSizeBy(10);
 		}
 //////End of Throughput optimized //////////////
 
 /// Average Latency optimized //////////////
-		if (oldMeanLatency - currentMeanLatency >= oldMeanLatency * 1 / 100) {
+		if (oldMeanLatency - currentMeanLatency >= oldMeanLatency * 5 / 100) {
 			threadPool.incrementPoolSizeBy(10);
 		}
 
-		if (currentMeanLatency - oldMeanLatency >= oldMeanLatency * 1 / 100) {
+		if (currentMeanLatency - oldMeanLatency >= oldMeanLatency * 5 / 100) {
 			threadPool.decrementPoolSizeBy(10);
 		}
 /// End of Average latency optimized //////////////
 
 ///// 99th percentile of latency optimized //////////////
-		if (current99PLatency - old99PLatency >= old99PLatency * 1 / 100) {
+		if ( old99PLatency - current99PLatency >= old99PLatency * 5 / 100) {
 			threadPool.incrementPoolSizeBy(10);
 
 		}
 
-		if (old99PLatency - current99PLatency >= old99PLatency * 1 / 100) {
+		if ( current99PLatency - old99PLatency >= old99PLatency * 5 / 100) {
 			threadPool.decrementPoolSizeBy(10);
 		}
 ///// End of 99th percentile of latency optimized //////////////
