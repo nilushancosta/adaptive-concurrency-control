@@ -29,57 +29,61 @@ public class DbRead implements Runnable {
 
 	@Override
 	public void run() {
-		ThreadPoolSizeModifier.IN_PROGRESS_COUNT++;
-		Timer.Context context = ThreadPoolSizeModifier.TIMER.time(); // start dropwizard timer
-		Connection connection = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		Timestamp readTimestamp = null;
 		try {
-			Random randId = new Random();
-			int toRead = randId.nextInt(50000) + 1;
-			connection = DriverManager.getConnection(
-					"jdbc:mysql://127.0.0.1:3306/echoserver?useSSL=false&autoReconnect=true&failOverReadOnly=false&maxReconnects=10",
-					"root", "root");
-			String sql = "SELECT timestamp FROM Timestamp WHERE id=?";
-			stmt = connection.prepareStatement(sql);
-			stmt.setInt(1, toRead);
-			rs = stmt.executeQuery();
-			while (rs.next()) {
-				readTimestamp = rs.getTimestamp("timestamp");
+			ThreadPoolSizeModifier.IN_PROGRESS_COUNT++;
+			Timer.Context context = ThreadPoolSizeModifier.TIMER.time(); // start dropwizard timer
+			Connection connection = null;
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			Timestamp readTimestamp = null;
+			try {
+				Random randId = new Random();
+				int toRead = randId.nextInt(50000) + 1;
+				connection = DriverManager.getConnection(
+						"jdbc:mysql://127.0.0.1:3306/echoserver?useSSL=false&autoReconnect=true&failOverReadOnly=false&maxReconnects=10",
+						"root", "root");
+				String sql = "SELECT timestamp FROM Timestamp WHERE id=?";
+				stmt = connection.prepareStatement(sql);
+				stmt.setInt(1, toRead);
+				rs = stmt.executeQuery();
+				while (rs.next()) {
+					readTimestamp = rs.getTimestamp("timestamp");
+				}
+			} catch (Exception e) {
+				AdaptiveConcurrencyControl.LOGGER.error("Exception", e);
+			} finally {
+				if (rs != null) {
+					try {
+						rs.close();
+					} catch (Exception e) {
+						AdaptiveConcurrencyControl.LOGGER.error("Exception", e);
+					}
+				}
+				if (stmt != null) {
+					try {
+						stmt.close();
+					} catch (Exception e) {
+						AdaptiveConcurrencyControl.LOGGER.error("Exception", e);
+					}
+				}
+				if (connection != null) {
+					try {
+						connection.close();
+					} catch (Exception e) {
+						AdaptiveConcurrencyControl.LOGGER.error("Exception", e);
+					}
+				}
 			}
+			String readTimestampStr = readTimestamp.toString() + "\n";
+			ByteBuf buf = Unpooled.copiedBuffer(readTimestampStr.getBytes());
+			ReferenceCountUtil.release(msg);
+			ctx.write(buf);
+			ctx.flush();
+			context.stop();
+			ThreadPoolSizeModifier.IN_PROGRESS_COUNT--;
 		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (rs != null) {
-				try {
-					rs.close();
-				} catch (Exception e) {
-					e.printStackTrace(System.out);
-				}
-			}
-			if (stmt != null) {
-				try {
-					stmt.close();
-				} catch (Exception e) {
-					e.printStackTrace(System.out);
-				}
-			}
-			if (connection != null) {
-				try {
-					connection.close();
-				} catch (Exception e) {
-					e.printStackTrace(System.out);
-				}
-			}
+			AdaptiveConcurrencyControl.LOGGER.error("Exception in DbRead Run method", e);
 		}
-		String readTimestampStr = readTimestamp.toString() + "\n";
-		ByteBuf buf = Unpooled.copiedBuffer(readTimestampStr.getBytes());
-		ReferenceCountUtil.release(msg);
-		ctx.write(buf);
-		ctx.flush();
-		context.stop();
-		ThreadPoolSizeModifier.IN_PROGRESS_COUNT--;
 
 	}
 

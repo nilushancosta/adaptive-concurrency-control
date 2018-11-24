@@ -25,16 +25,19 @@ public class Prime implements Runnable {
 
 	@Override
 	public void run() {
-		ThreadPoolSizeModifier.IN_PROGRESS_COUNT++;
-		Timer.Context context = ThreadPoolSizeModifier.TIMER.time(); // start dropwizard timer
-		BigInteger num = new BigInteger(2048, new Random());
-		String resultString = String.valueOf(num.isProbablePrime(10)) + "\n";
-		ByteBuf buf = Unpooled.copiedBuffer(resultString.getBytes());
-		ctx.write(buf);
-		ctx.flush();
-		ReferenceCountUtil.release(msg);
-		context.stop();
-		ThreadPoolSizeModifier.IN_PROGRESS_COUNT--;
+		try {
+			ThreadPoolSizeModifier.IN_PROGRESS_COUNT++;
+			Timer.Context context = ThreadPoolSizeModifier.TIMER.time(); // start dropwizard timer
+			BigInteger num = new BigInteger(2048, new Random());
+			String resultString = String.valueOf(num.isProbablePrime(10)) + "\n";
+			ByteBuf buf = Unpooled.copiedBuffer(resultString.getBytes());
+			ctx.write(buf);
+			ctx.flush();
+			ReferenceCountUtil.release(msg);
+			context.stop();
+			ThreadPoolSizeModifier.IN_PROGRESS_COUNT--;
+		} catch (Exception e) {
+			AdaptiveConcurrencyControl.LOGGER.error("Exception in Prime Run method", e);
+		}
 	}
-
 }

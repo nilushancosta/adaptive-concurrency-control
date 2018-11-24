@@ -25,12 +25,11 @@ public class AdaptiveConcurrencyControl {
 																								// to run the periodic
 																								// thread count
 																								// adjustment
-		CustomThreadPool thirdThreadPool = new CustomThreadPool(initWorkerThreads); // Create the thread pool to handle workload
-																	// processing
+		CustomThreadPool thirdThreadPool = new CustomThreadPool(initWorkerThreads); // Create the thread pool to handle
+																					// workload processing
 		threadPoolSizeModifier.scheduleAtFixedRate(new ThreadPoolSizeModifier(thirdThreadPool),
 				THREAD_POOL_MODIFICATION_INITIAL_DELAY, THREAD_POOL_MODIFICATION_PERIOD, TimeUnit.SECONDS);
 		new NettyServer(PORT, testName, thirdThreadPool).run();
 
 	}
-
 }

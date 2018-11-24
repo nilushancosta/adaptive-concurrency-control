@@ -25,24 +25,29 @@ public class Factorial implements Runnable {
 
 	@Override
 	public void run() {
-		ThreadPoolSizeModifier.IN_PROGRESS_COUNT++;
-		Timer.Context context = ThreadPoolSizeModifier.TIMER.time(); // start dropwizard timer
-		BigInteger result = BigInteger.ONE;
-		String resultString;
-		int randomNumber = ThreadLocalRandom.current().nextInt(2000, 2999 + 1); // Generate random number between 2000
-																				// and 2999
-		for (int i = randomNumber; i > 0; i--) {
-			result = result.multiply(BigInteger.valueOf(i));
+		try {
+			ThreadPoolSizeModifier.IN_PROGRESS_COUNT++;
+			Timer.Context context = ThreadPoolSizeModifier.TIMER.time(); // start dropwizard timer
+			BigInteger result = BigInteger.ONE;
+			String resultString;
+			int randomNumber = ThreadLocalRandom.current().nextInt(2000, 2999 + 1); // Generate random number between
+																					// 2000
+																					// and 2999
+			for (int i = randomNumber; i > 0; i--) {
+				result = result.multiply(BigInteger.valueOf(i));
+			}
+			resultString = result.toString().substring(0, 3) + "\n"; // get a substring to prevent the effect of network
+																		// I/O
+																		// affecting factorial calculation performance
+			ByteBuf buf = Unpooled.copiedBuffer(resultString.getBytes());
+			ctx.write(buf);
+			ctx.flush();
+			ReferenceCountUtil.release(msg);
+			context.stop();
+			ThreadPoolSizeModifier.IN_PROGRESS_COUNT--;
+		} catch (Exception e) {
+			AdaptiveConcurrencyControl.LOGGER.error("Exception in Factorial Run method", e);
 		}
-		resultString = result.toString().substring(0, 3) + "\n"; // get a substring to prevent the effect of network I/O
-																	// affecting factorial calculation performance
-		ByteBuf buf = Unpooled.copiedBuffer(resultString.getBytes());
-		ctx.write(buf);
-		ctx.flush();
-		ReferenceCountUtil.release(msg);
-		context.stop();
-		ThreadPoolSizeModifier.IN_PROGRESS_COUNT--;
-
 	}
 
 }
