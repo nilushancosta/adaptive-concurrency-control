@@ -33,7 +33,7 @@ public class Prime implements Runnable {
 			ByteBuf buf = Unpooled.copiedBuffer(resultString.getBytes());
 			ctx.write(buf);
 			ctx.flush();
-			ReferenceCountUtil.release(msg);
+			//ReferenceCountUtil.release(msg);
 			context.stop();
 			ThreadPoolSizeModifier.IN_PROGRESS_COUNT--;
 		} catch (Exception e) {
