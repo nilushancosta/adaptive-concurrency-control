@@ -1,8 +1,11 @@
 package com.nilushan.adaptive_concurrency_control;
 
+import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import io.netty.buffer.ByteBuf;
 
 public class CustomThreadPool {
 
@@ -24,10 +27,26 @@ public class CustomThreadPool {
 	/**
 	 * Submits a task to the thread pool
 	 *
-	 * @param worker task to be executed in the thread pool
+	 * @param task to be executed in the thread pool
 	 */
-	public void submitTask(Runnable worker) {
-		executor.execute(worker);
+	public Future<ByteBuf> submitTask(Prime task) {
+		return executor.submit(task);
+	}
+	
+	public Future<ByteBuf> submitTask(Sqrt task) {
+		return executor.submit(task);
+	}
+	
+	public Future<ByteBuf> submitTask(Factorial task) {
+		return executor.submit(task);
+	}
+	
+	public Future<ByteBuf> submitTask(DbWrite task) {
+		return executor.submit(task);
+	}
+	
+	public Future<ByteBuf> submitTask(DbRead task) {
+		return executor.submit(task);
 	}
 
 	/**

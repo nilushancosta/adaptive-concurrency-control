@@ -1,6 +1,7 @@
 package com.nilushan.adaptive_concurrency_control;
 
 import java.math.BigInteger;
+import java.util.concurrent.Callable;
 
 import com.codahale.metrics.Timer;
 
@@ -13,21 +14,16 @@ import io.netty.channel.ChannelHandlerContext;
 /**
  * Test to measure performance of Factorial calculation
  */
-public class Factorial implements Runnable {
+public class Factorial implements Callable<ByteBuf> {
 
-	private Object msg;
-	private ChannelHandlerContext ctx;
-
-	public Factorial(ChannelHandlerContext ctx, Object msg) {
-		this.msg = msg;
-		this.ctx = ctx;
+	public Factorial() {
 	}
 
 	@Override
-	public void run() {
+	public ByteBuf call() {
+		ByteBuf buf = null;
 		try {
 			ThreadPoolSizeModifier.IN_PROGRESS_COUNT++;
-			Timer.Context context = ThreadPoolSizeModifier.TIMER.time(); // start dropwizard timer
 			BigInteger result = BigInteger.ONE;
 			String resultString;
 			int randomNumber = ThreadLocalRandom.current().nextInt(2000, 2999 + 1); // Generate random number between
@@ -39,15 +35,12 @@ public class Factorial implements Runnable {
 			resultString = result.toString().substring(0, 3) + "\n"; // get a substring to prevent the effect of network
 																		// I/O
 																		// affecting factorial calculation performance
-			ByteBuf buf = Unpooled.copiedBuffer(resultString.getBytes());
-			ctx.write(buf);
-			ctx.flush();
-			ReferenceCountUtil.release(msg);
-			context.stop();
+			buf = Unpooled.copiedBuffer(resultString.getBytes());
 			ThreadPoolSizeModifier.IN_PROGRESS_COUNT--;
 		} catch (Exception e) {
 			AdaptiveConcurrencyControl.LOGGER.error("Exception in Factorial Run method", e);
 		}
+		return (buf);
 	}
 
 }

@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Random;
+import java.util.concurrent.Callable;
 
 import com.codahale.metrics.Timer;
 
@@ -17,21 +18,16 @@ import io.netty.channel.ChannelHandlerContext;
 /**
  * Test to measure performance of Database Read
  */
-public class DbRead implements Runnable {
+public class DbRead implements Callable<ByteBuf> {
 
-	private Object msg;
-	private ChannelHandlerContext ctx;
-
-	public DbRead(ChannelHandlerContext ctx, Object msg) {
-		this.msg = msg;
-		this.ctx = ctx;
+	public DbRead() {
 	}
 
 	@Override
-	public void run() {
+	public ByteBuf call() {
+		ByteBuf buf = null;
 		try {
 			ThreadPoolSizeModifier.IN_PROGRESS_COUNT++;
-			Timer.Context context = ThreadPoolSizeModifier.TIMER.time(); // start dropwizard timer
 			Connection connection = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -75,15 +71,12 @@ public class DbRead implements Runnable {
 				}
 			}
 			String readTimestampStr = readTimestamp.toString() + "\n";
-			ByteBuf buf = Unpooled.copiedBuffer(readTimestampStr.getBytes());
-			ReferenceCountUtil.release(msg);
-			ctx.write(buf);
-			ctx.flush();
-			context.stop();
+			buf = Unpooled.copiedBuffer(readTimestampStr.getBytes());
 			ThreadPoolSizeModifier.IN_PROGRESS_COUNT--;
 		} catch (Exception e) {
 			AdaptiveConcurrencyControl.LOGGER.error("Exception in DbRead Run method", e);
 		}
+		return (buf);
 
 	}
 

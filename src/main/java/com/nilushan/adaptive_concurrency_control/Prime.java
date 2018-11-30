@@ -2,6 +2,7 @@ package com.nilushan.adaptive_concurrency_control;
 
 import java.math.BigInteger;
 import java.util.Random;
+import java.util.concurrent.Callable;
 
 import com.codahale.metrics.Timer;
 
@@ -13,31 +14,23 @@ import io.netty.channel.ChannelHandlerContext;
 /**
  * Test to measure performance of Primality check
  */
-public class Prime implements Runnable {
+public class Prime implements Callable<ByteBuf> {
 
-	private Object msg;
-	private ChannelHandlerContext ctx;
-
-	public Prime(ChannelHandlerContext ctx, Object msg) {
-		this.msg = msg;
-		this.ctx = ctx;
+	public Prime() {
 	}
 
 	@Override
-	public void run() {
+	public ByteBuf call() {
+		ByteBuf buf = null;
 		try {
 			ThreadPoolSizeModifier.IN_PROGRESS_COUNT++;
-			Timer.Context context = ThreadPoolSizeModifier.TIMER.time(); // start dropwizard timer
 			BigInteger num = new BigInteger(2048, new Random());
 			String resultString = String.valueOf(num.isProbablePrime(10)) + "\n";
-			ByteBuf buf = Unpooled.copiedBuffer(resultString.getBytes());
-			ctx.write(buf);
-			ctx.flush();
-			//ReferenceCountUtil.release(msg);
-			context.stop();
+			buf = Unpooled.copiedBuffer(resultString.getBytes());
 			ThreadPoolSizeModifier.IN_PROGRESS_COUNT--;
 		} catch (Exception e) {
 			AdaptiveConcurrencyControl.LOGGER.error("Exception in Prime Run method", e);
 		}
+		return (buf);
 	}
 }
