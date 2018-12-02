@@ -55,8 +55,8 @@ public class ThreadPoolSizeModifier implements Runnable {
 		double currentTenSecondRate = TIMER.getTenSecondRate();
 		double rateDifference = currentTenSecondRate - oldTenSecondRate;
 		int currentInProgressCount = IN_PROGRESS_COUNT;
-		double currentMeanLatency = TIMER.getSnapshot().getMean();
-		double current99PLatency = TIMER.getSnapshot().get99thPercentile();
+		double currentMeanLatency = TIMER.getSnapshot().getMean() / 1000000; // Divided by 1000000 to convert the time to ms
+		double current99PLatency = TIMER.getSnapshot().get99thPercentile() / 1000000 ; //Divided by 1000000 to convert the time to ms
 		AdaptiveConcurrencyControl.LOGGER
 				.info(currentThreadPoolSize + ", " + currentTenSecondRate + ", " + rateDifference + ", "
 						+ currentInProgressCount + ", " + currentMeanLatency + ", " + current99PLatency); // Log metrics
