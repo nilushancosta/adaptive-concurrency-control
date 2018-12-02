@@ -19,11 +19,14 @@ import java.lang.String;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import com.codahale.metrics.Timer;
+
 public class NettyServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
 	private String testName;
 	private CustomThreadPool executingPool;
 	private Future<ByteBuf> result;
+	private Timer.Context timerContext;
 
 	public NettyServerHandler(String name, CustomThreadPool pool) {
 		this.testName = name;
@@ -32,6 +35,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
 	@Override
 	public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) {
+		timerContext = ThreadPoolSizeModifier.TIMER.time();  // Start Dropwizard metrics timer
 		if (testName.equals("Factorial")) {
 			Factorial ft = new Factorial();
 			result = executingPool.submitTask(ft);
@@ -68,6 +72,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<FullHttpRequ
 			ctx.write(response);
 		}
 		ctx.flush();
+		timerContext.stop(); // Stop Dropwizard metrics timer
 	}
 
 	@Override
