@@ -16,6 +16,9 @@ public class ThreadPoolSizeModifier implements Runnable {
 	public static int oldInProgressCount;
 	private CustomThreadPool threadPool;
 	private String optimizationAlgorithm;
+	private static boolean HAS_STARTED, ODD_ITR, EVEN_ITR; // Used to identify the odd and even iterations when run() is
+															// executed periodically
+	private static boolean IMPROVED; //Variable to check if changing thread pool size makes improvements
 
 	/*
 	 * Constructor
@@ -28,6 +31,10 @@ public class ThreadPoolSizeModifier implements Runnable {
 		METRICS = new MetricRegistry();
 		BUILDER = new HdrBuilder();
 		TIMER = BUILDER.buildAndRegisterTimer(METRICS, "ThroughputAndLatency");
+		HAS_STARTED = false;
+		ODD_ITR = false;
+		EVEN_ITR = false;
+		IMPROVED = true;
 		AdaptiveConcurrencyControl.LOGGER.info(
 				"Thread pool size, Current 10 Second Throughput, Throughput Difference, In pogress count, Average Latency, 99th percentile Latency"); // First
 																																						// line
@@ -39,6 +46,11 @@ public class ThreadPoolSizeModifier implements Runnable {
 
 	@Override
 	public void run() {
+		if (HAS_STARTED == false) { // When this method is executed for the first time
+			ODD_ITR = true;
+			HAS_STARTED = true;
+		}
+		//System.out.println(HAS_STARTED + "," + ODD_ITR + "," + EVEN_ITR);
 		int currentThreadPoolSize = threadPool.getThreadPoolSize();
 		double currentTenSecondRate = TIMER.getTenSecondRate();
 		double rateDifference = currentTenSecondRate - oldTenSecondRate;
@@ -50,33 +62,45 @@ public class ThreadPoolSizeModifier implements Runnable {
 						+ currentInProgressCount + ", " + currentMeanLatency + ", " + current99PLatency); // Log metrics
 
 		if (optimizationAlgorithm.equals("T")) { // If Throughput Optimized
-			if (currentTenSecondRate - oldTenSecondRate >= oldTenSecondRate * 5 / 100) {
+			if (ODD_ITR == true && IMPROVED == true) {
 				threadPool.incrementPoolSizeBy(10);
 			}
-
-			if (oldTenSecondRate - currentTenSecondRate >= oldTenSecondRate * 5 / 100) {
-				threadPool.decrementPoolSizeBy(10);
+			if (EVEN_ITR == true) {
+				if ( currentTenSecondRate - oldTenSecondRate < oldTenSecondRate * 10 / 100) {
+					IMPROVED = false;
+				}
+				else {
+					IMPROVED = true;
+				}
 			}
 		}
 
 		if (optimizationAlgorithm.equals("M")) { // If Mean latency Optimized
-			if (oldMeanLatency - currentMeanLatency >= oldMeanLatency * 5 / 100) {
+			if (ODD_ITR == true && IMPROVED == true) {
 				threadPool.incrementPoolSizeBy(10);
 			}
-
-			if (currentMeanLatency - oldMeanLatency >= oldMeanLatency * 5 / 100) {
-				threadPool.decrementPoolSizeBy(10);
+			if (EVEN_ITR == true) {
+				//System.out.println(currentMeanLatency + "," + oldMeanLatency);
+				if ( currentMeanLatency - oldMeanLatency < oldMeanLatency * 10 / 100) {
+					IMPROVED = false;
+				}
+				else {
+					IMPROVED = true;
+				}
 			}
 		}
 
-
-		if (optimizationAlgorithm.equals("99P")) { //If 99th Percentile of Latency Optimized
-			if (old99PLatency - current99PLatency >= old99PLatency * 5 / 100) {
+		if (optimizationAlgorithm.equals("99P")) { // If 99th Percentile of Latency Optimized
+			if (ODD_ITR == true && IMPROVED == true) {
 				threadPool.incrementPoolSizeBy(10);
 			}
-
-			if (current99PLatency - old99PLatency >= old99PLatency * 5 / 100) {
-				threadPool.decrementPoolSizeBy(10);
+			if (EVEN_ITR == true) {
+				if (current99PLatency - old99PLatency < old99PLatency * 10 / 100) {
+					IMPROVED = false;
+				}
+				else {
+					IMPROVED = true;
+				}
 			}
 		}
 
@@ -84,5 +108,14 @@ public class ThreadPoolSizeModifier implements Runnable {
 		oldMeanLatency = currentMeanLatency;
 		old99PLatency = current99PLatency;
 		oldInProgressCount = currentInProgressCount;
+
+		if (ODD_ITR == true) {
+			ODD_ITR = false;
+			EVEN_ITR = true;
+		} else if (EVEN_ITR == true) {
+			EVEN_ITR = false;
+			ODD_ITR = true;
+		}
 	}
+
 }
