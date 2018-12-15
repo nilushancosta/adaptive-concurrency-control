@@ -1,6 +1,7 @@
 package com.nilushan.adaptive_concurrency_control;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -16,7 +17,6 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 import java.lang.String;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import com.codahale.metrics.Timer;
@@ -28,14 +28,15 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<FullHttpRequ
 	private Future<ByteBuf> result;
 	private Timer.Context timerContext;
 
-	public NettyServerHandler(String name, CustomThreadPool pool) {
+	public NettyServerHandler(String name, CustomThreadPool pool, Timer.Context tContext) {
 		this.testName = name;
 		this.executingPool = pool;
+		this.timerContext = tContext;
 	}
 
 	@Override
 	public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) {
-		timerContext = ThreadPoolSizeModifier.TIMER.time();  // Start Dropwizard metrics timer
+		
 		if (testName.equals("Factorial")) {
 			Factorial ft = new Factorial();
 			result = executingPool.submitTask(ft);
@@ -43,8 +44,8 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<FullHttpRequ
 			Sqrt st = new Sqrt();
 			result = executingPool.submitTask(st);
 		} else if (testName.equals("Prime")) {
-			Prime pr = new Prime();
-			result = executingPool.submitTask(pr);
+			Prime pr = new Prime();			
+			result = executingPool.submitTask(pr);			
 		} else if (testName.equals("DbWrite")) {
 			DbWrite dw = new DbWrite();
 			result = executingPool.submitTask(dw);
@@ -52,7 +53,8 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<FullHttpRequ
 			DbRead dr = new DbRead();
 			result = executingPool.submitTask(dr);
 		}
-
+		
+		
 		boolean keepAlive = HttpUtil.isKeepAlive(msg);
 		FullHttpResponse response = null;
 		try {
@@ -71,8 +73,14 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<FullHttpRequ
 			response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
 			ctx.write(response);
 		}
+		
+	}
+
+	@Override
+	public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
 		ctx.flush();
 		timerContext.stop(); // Stop Dropwizard metrics timer
+		
 	}
 
 	@Override

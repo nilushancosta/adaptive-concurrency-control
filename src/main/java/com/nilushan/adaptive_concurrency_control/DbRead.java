@@ -25,6 +25,7 @@ public class DbRead implements Callable<ByteBuf> {
 
 	@Override
 	public ByteBuf call() {
+		Timer.Context throughputTimerContext = ThreadPoolSizeModifier.TIMER2.time();
 		ByteBuf buf = null;
 		try {
 			ThreadPoolSizeModifier.IN_PROGRESS_COUNT++;
@@ -76,6 +77,7 @@ public class DbRead implements Callable<ByteBuf> {
 		} catch (Exception e) {
 			AdaptiveConcurrencyControl.LOGGER.error("Exception in DbRead Run method", e);
 		}
+		throughputTimerContext.stop();
 		return (buf);
 
 	}
