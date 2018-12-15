@@ -24,6 +24,7 @@ public class ThreadPoolSizeModifier implements Runnable {
 																						// executed periodically
 	private static boolean INC_IMPROVED; // Variable to check if increasing thread pool size makes improvements
 	private static boolean DEC_IMPROVED; // Variable to check if decreasing thread pool size makes improvements
+	int incrementLock, decrementLock;
 	/*
 	 * Constructor
 	 * 
@@ -80,6 +81,7 @@ public class ThreadPoolSizeModifier implements Runnable {
 				if (currentTenSecondRate - oldTenSecondRate < oldTenSecondRate * 5 / 100) {
 					INC_IMPROVED = false;
 					threadPool.decrementPoolSizeBy(10);
+					incrementLock = 10; //Prevent increments for the next two sets of iterations
 				}
 			}
 			if (DEC_ITR == true && DEC_IMPROVED == true) {
@@ -89,6 +91,7 @@ public class ThreadPoolSizeModifier implements Runnable {
 				if (currentTenSecondRate - oldTenSecondRate < oldTenSecondRate * 5 / 100) {
 					DEC_IMPROVED = false;
 					threadPool.incrementPoolSizeBy(10);
+					decrementLock = 10; //Prevent decrements for the next two sets of iterations
 				}
 			}
 		}
@@ -158,6 +161,18 @@ public class ThreadPoolSizeModifier implements Runnable {
 			INC_CHECK_ITR = false;
 			DEC_ITR = false;
 			DEC_CHECK_ITR = false;
+		}
+	
+		if (incrementLock > 0) {
+			incrementLock-- ;
+		} else if (incrementLock == 0) { //Reset INC_IMROVED after incrementLock reaches 0
+			INC_IMPROVED = true;
+		}
+		
+		if (decrementLock > 0) {
+			decrementLock--;
+		} else if (decrementLock == 0) { //Reset DEC_IMPROVED after decrementLock reaches 0
+			DEC_IMPROVED = true;
 		}
 	}
 
