@@ -21,7 +21,7 @@ public class Factorial implements Callable<ByteBuf> {
 
 	@Override
 	public ByteBuf call() {
-		Timer.Context throughputTimerContext = ThreadPoolSizeModifier.TIMER2.time();
+		Timer.Context throughputTimerContext = ThreadPoolSizeModifier.THROUGHPUT_TIMER.time();
 		ByteBuf buf = null;
 		try {
 			ThreadPoolSizeModifier.IN_PROGRESS_COUNT++;
