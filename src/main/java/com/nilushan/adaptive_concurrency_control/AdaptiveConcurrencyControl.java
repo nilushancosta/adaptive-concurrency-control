@@ -30,7 +30,7 @@ public class AdaptiveConcurrencyControl {
 																					// workload processing
 		threadPoolSizeModifier.scheduleAtFixedRate(new ThreadPoolSizeModifier(thirdThreadPool, optimization),
 				THREAD_POOL_MODIFICATION_INITIAL_DELAY, THREAD_POOL_MODIFICATION_PERIOD, TimeUnit.SECONDS);
-		new NettyServer(PORT, testName, thirdThreadPool).run();
+		new NettyServer(PORT, testName, thirdThreadPool).start();
 
 	}
 }

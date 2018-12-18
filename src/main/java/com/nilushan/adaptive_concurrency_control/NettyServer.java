@@ -27,7 +27,7 @@ public class NettyServer {
 		this.executingPool = pool;
 	}
 
-	public void run() throws Exception {
+	public void start() throws Exception {
 
 		EventLoopGroup bossGroup = new NioEventLoopGroup();
 		EventLoopGroup workerGroup = new NioEventLoopGroup();
