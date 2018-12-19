@@ -1,6 +1,9 @@
 package com.nilushan.adaptive_concurrency_control;
 
+import java.time.Duration;
+
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Snapshot;
 import com.codahale.metrics.Timer;
 import com.github.rollingmetrics.histogram.HdrBuilder;
 
@@ -36,6 +39,8 @@ public class ThreadPoolSizeModifier implements Runnable {
 		this.optimizationAlgorithm = optimization;
 		METRICS = new MetricRegistry();
 		BUILDER = new HdrBuilder();
+		BUILDER.resetReservoirOnSnapshot();
+		BUILDER.withPredefinedPercentiles(new double[] {0.99}); //Predefine required percentiles
 		LATENCY_TIMER = BUILDER.buildAndRegisterTimer(METRICS, "ThroughputAndLatency");
 		METRICS2 = new MetricRegistry();
 		BUILDER2 = new HdrBuilder();
@@ -66,8 +71,9 @@ public class ThreadPoolSizeModifier implements Runnable {
 		double currentTenSecondRate = THROUGHPUT_TIMER.getTenSecondRate();
 		double rateDifference = currentTenSecondRate - oldTenSecondRate;
 		int currentInProgressCount = IN_PROGRESS_COUNT;
-		double currentMeanLatency = LATENCY_TIMER.getSnapshot().getMean() / 1000000; //Divided by 1000000 to convert the time to ms
-		double current99PLatency = LATENCY_TIMER.getSnapshot().get99thPercentile() / 1000000; //Divided by 1000000 to convert the time to ms
+		Snapshot latencySnapshot = LATENCY_TIMER.getSnapshot();
+		double currentMeanLatency = latencySnapshot.getMean() / 1000000; //Divided by 1000000 to convert the time to ms
+		double current99PLatency = latencySnapshot.get99thPercentile() / 1000000; //Divided by 1000000 to convert the time to ms
 		AdaptiveConcurrencyControl.LOGGER.info(
 				currentThreadPoolSize + ", " + currentTenSecondRate + ", " + rateDifference
 						+ ", " + currentInProgressCount + ", " + currentMeanLatency + ", " + current99PLatency); // Log metrics
