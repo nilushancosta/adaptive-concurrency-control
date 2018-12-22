@@ -25,7 +25,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
 	private String testName;
 	private CustomThreadPool executingPool;
-	private Future<ByteBuf> result;
 	private Timer.Context timerContext;
 
 	public NettyServerHandler(String name, CustomThreadPool pool, Timer.Context tContext) {
@@ -36,51 +35,18 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
 	@Override
 	public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) {
-		
-		if (testName.equals("Factorial")) {
-			Factorial ft = new Factorial();
-			result = executingPool.submitTask(ft);
-		} else if (testName.equals("Sqrt")) {
-			Sqrt st = new Sqrt();
-			result = executingPool.submitTask(st);
-		} else if (testName.equals("Prime")) {
-			Prime pr = new Prime();			
-			result = executingPool.submitTask(pr);			
-		} else if (testName.equals("DbWrite")) {
-			DbWrite dw = new DbWrite();
-			result = executingPool.submitTask(dw);
-		} else if (testName.equals("DbRead")) {
-			DbRead dr = new DbRead();
-			result = executingPool.submitTask(dr);
-		}
-		
-		
-		boolean keepAlive = HttpUtil.isKeepAlive(msg);
-		FullHttpResponse response = null;
-		try {
-			response = new DefaultFullHttpResponse(HTTP_1_1, OK, result.get());
-		} catch (Exception e) {
-			AdaptiveConcurrencyControl.LOGGER.error("Exception in Netty Handler", e);
-		}
-		String contentType = msg.headers().get(HttpHeaderNames.CONTENT_TYPE);
-		if (contentType != null) {
-			response.headers().set(HttpHeaderNames.CONTENT_TYPE, contentType);
-		}
-		response.headers().setInt(HttpHeaderNames.CONTENT_LENGTH, response.content().readableBytes());
-		if (!keepAlive) {
-			ctx.write(response).addListener(ChannelFutureListener.CLOSE);
-		} else {
-			response.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
-			ctx.write(response);
-		}
-		
-	}
 
-	@Override
-	public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-		ctx.flush();
-		timerContext.stop(); // Stop Dropwizard metrics timer
-		
+		if (testName.equals("Factorial")) {
+			executingPool.submitTask(new Factorial(ctx, msg, timerContext));
+		} else if (testName.equals("Sqrt")) {
+			executingPool.submitTask(new Sqrt(ctx, msg, timerContext));
+		} else if (testName.equals("Prime")) {
+			executingPool.submitTask(new Prime(ctx, msg, timerContext));
+		} else if (testName.equals("DbWrite")) {
+			executingPool.submitTask(new DbWrite(ctx, msg, timerContext));
+		} else if (testName.equals("DbRead")) {
+			executingPool.submitTask(new DbRead(ctx, msg, timerContext));
+		}
 	}
 
 	@Override

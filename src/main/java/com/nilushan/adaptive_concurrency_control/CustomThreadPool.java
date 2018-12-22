@@ -29,24 +29,8 @@ public class CustomThreadPool {
 	 *
 	 * @param task to be executed in the thread pool
 	 */
-	public Future<ByteBuf> submitTask(Prime task) {
-		return executor.submit(task);
-	}
-	
-	public Future<ByteBuf> submitTask(Sqrt task) {
-		return executor.submit(task);
-	}
-	
-	public Future<ByteBuf> submitTask(Factorial task) {
-		return executor.submit(task);
-	}
-	
-	public Future<ByteBuf> submitTask(DbWrite task) {
-		return executor.submit(task);
-	}
-	
-	public Future<ByteBuf> submitTask(DbRead task) {
-		return executor.submit(task);
+	public void submitTask(Runnable worker) {
+		executor.execute(worker);
 	}
 
 	/**
