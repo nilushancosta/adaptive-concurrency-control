@@ -87,7 +87,7 @@ public class ThreadPoolSizeModifier implements Runnable {
 				if (currentTenSecondRate - oldTenSecondRate < oldTenSecondRate * 5 / 100) {
 					INC_IMPROVED = false;
 					threadPool.decrementPoolSizeBy(10);
-					incrementLock = 34; //Prevent increments for the next 8 sets of iterations
+					incrementLock = 14; //Prevent increments for the next 8 sets of iterations
 				}
 			}
 			if (DEC_ITR == true && DEC_IMPROVED == true) {
@@ -97,7 +97,7 @@ public class ThreadPoolSizeModifier implements Runnable {
 				if (currentTenSecondRate - oldTenSecondRate < oldTenSecondRate * 5 / 100) {
 					DEC_IMPROVED = false;
 					threadPool.incrementPoolSizeBy(10);
-					decrementLock = 34; //Prevent decrements for the next 8 sets of iterations
+					decrementLock = 14; //Prevent decrements for the next 8 sets of iterations
 				}
 			}
 		}
@@ -110,7 +110,7 @@ public class ThreadPoolSizeModifier implements Runnable {
 				if (currentMeanLatency - oldMeanLatency < oldMeanLatency * 5 / 100) {
 					INC_IMPROVED = false;
 					threadPool.decrementPoolSizeBy(10);
-					incrementLock = 34; //Prevent increments for the next 8 sets of iterations
+					incrementLock = 14; //Prevent increments for the next 8 sets of iterations
 				}
 			}
 			if (DEC_ITR == true && DEC_IMPROVED == true) {
@@ -120,7 +120,7 @@ public class ThreadPoolSizeModifier implements Runnable {
 				if (currentMeanLatency - oldMeanLatency < oldMeanLatency * 5 / 100) {
 					DEC_IMPROVED = false;
 					threadPool.incrementPoolSizeBy(10);
-					decrementLock = 34; //Prevent decrements for the next 8 sets of iterations
+					decrementLock = 14; //Prevent decrements for the next 8 sets of iterations
 				}
 			}
 		}
@@ -133,7 +133,7 @@ public class ThreadPoolSizeModifier implements Runnable {
 				if (current99PLatency - old99PLatency < old99PLatency * 10 / 100) {
 					INC_IMPROVED = false;
 					threadPool.decrementPoolSizeBy(10);
-					incrementLock = 34; //Prevent increments for the next 8 sets of iterations
+					incrementLock = 14; //Prevent increments for the next 8 sets of iterations
 				}
 			}
 			if (DEC_ITR == true && DEC_IMPROVED == true) {
@@ -143,7 +143,7 @@ public class ThreadPoolSizeModifier implements Runnable {
 				if (currentMeanLatency - oldMeanLatency < oldMeanLatency * 5 / 100) {
 					DEC_IMPROVED = false;
 					threadPool.incrementPoolSizeBy(10);
-					decrementLock = 34; //Prevent decrements for the next 8 sets of iterations
+					decrementLock = 14; //Prevent decrements for the next 8 sets of iterations
 				}
 			}
 		}
