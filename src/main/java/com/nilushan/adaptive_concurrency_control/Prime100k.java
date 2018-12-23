@@ -23,13 +23,13 @@ import io.netty.handler.codec.http.HttpUtil;
 /**
  * Test to measure performance of Primality check
  */
-public class Prime implements Runnable {
+public class Prime100k implements Runnable {
 
 	private FullHttpRequest msg;
 	private ChannelHandlerContext ctx;
 	private Timer.Context timerContext;
 
-	public Prime(ChannelHandlerContext ctx, FullHttpRequest msg, Timer.Context timerCtx) {
+	public Prime100k(ChannelHandlerContext ctx, FullHttpRequest msg, Timer.Context timerCtx) {
 		this.msg = msg;
 		this.ctx = ctx;
 		this.timerContext = timerCtx;
@@ -41,13 +41,19 @@ public class Prime implements Runnable {
 		ByteBuf buf = null;
 		try {
 			ThreadPoolSizeModifier.IN_PROGRESS_COUNT++;
-			//TimeUnit.MILLISECONDS.sleep(5000);
-			BigInteger num = new BigInteger(2048, new Random());
-			String resultString = String.valueOf(num.isProbablePrime(10)) + "\n";
+			Random rand = new Random();
+			int number = rand.nextInt((100021) - 100000 ) + 100000;  //Generate random integer between 100000 and 100020
+			String resultString = "true";
+			for (int i=2; i<number; i++) {
+				if (number%i == 0) {
+					resultString="false";
+					break;
+				}
+			}
 			buf = Unpooled.copiedBuffer(resultString.getBytes());
 			ThreadPoolSizeModifier.IN_PROGRESS_COUNT--;
 		} catch (Exception e) {
-			AdaptiveConcurrencyControl.LOGGER.error("Exception in Prime Run method", e);
+			AdaptiveConcurrencyControl.LOGGER.error("Exception in Prime520 Run method", e);
 		}
 		
 		boolean keepAlive = HttpUtil.isKeepAlive(msg);
