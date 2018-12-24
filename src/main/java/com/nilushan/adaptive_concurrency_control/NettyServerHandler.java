@@ -44,8 +44,10 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<FullHttpRequ
 			executingPool.submitTask(new Prime10k(ctx, msg, timerContext));
 		} else if (testName.equals("Prime100k")) {
 			executingPool.submitTask(new Prime100k(ctx, msg, timerContext));
-		} else if (testName.equals("Prime1000k")) {
-			executingPool.submitTask(new Prime1000k(ctx, msg, timerContext));
+		} else if (testName.equals("Prime1m")) {
+			executingPool.submitTask(new Prime1m(ctx, msg, timerContext));
+		} else if (testName.equals("Prime10m")) {
+			executingPool.submitTask(new Prime10m(ctx, msg, timerContext));
 		} else if (testName.equals("DbWrite")) {
 			executingPool.submitTask(new DbWrite(ctx, msg, timerContext));
 		} else if (testName.equals("DbRead")) {

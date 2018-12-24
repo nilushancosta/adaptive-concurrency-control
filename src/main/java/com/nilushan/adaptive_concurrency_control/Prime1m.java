@@ -23,13 +23,13 @@ import io.netty.handler.codec.http.HttpUtil;
 /**
  * Test to measure performance of Primality check
  */
-public class Prime1000k implements Runnable {
+public class Prime1m implements Runnable {
 
 	private FullHttpRequest msg;
 	private ChannelHandlerContext ctx;
 	private Timer.Context timerContext;
 
-	public Prime1000k(ChannelHandlerContext ctx, FullHttpRequest msg, Timer.Context timerCtx) {
+	public Prime1m(ChannelHandlerContext ctx, FullHttpRequest msg, Timer.Context timerCtx) {
 		this.msg = msg;
 		this.ctx = ctx;
 		this.timerContext = timerCtx;
@@ -43,7 +43,6 @@ public class Prime1000k implements Runnable {
 			ThreadPoolSizeModifier.IN_PROGRESS_COUNT++;
 			Random rand = new Random();
 			int number = rand.nextInt((1000021) - 1000000 ) + 1000000;  //Generate random integer between 100000 and 100020
-			System.out.println(number);
 			String resultString = "true";
 			for (int i=2; i<number; i++) {
 				if (number%i == 0) {
@@ -54,7 +53,7 @@ public class Prime1000k implements Runnable {
 			buf = Unpooled.copiedBuffer(resultString.getBytes());
 			ThreadPoolSizeModifier.IN_PROGRESS_COUNT--;
 		} catch (Exception e) {
-			AdaptiveConcurrencyControl.LOGGER.error("Exception in Prime520 Run method", e);
+			AdaptiveConcurrencyControl.LOGGER.error("Exception in Prime1m Run method", e);
 		}
 		
 		boolean keepAlive = HttpUtil.isKeepAlive(msg);
