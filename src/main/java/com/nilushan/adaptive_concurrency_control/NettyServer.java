@@ -46,7 +46,7 @@ public class NettyServer {
 							p.addLast("aggregator", new HttpObjectAggregator(1048576));	
 							p.addLast(new NettyServerHandler(test, executingPool, latencyTimerContext));
 						}
-					}).option(ChannelOption.SO_BACKLOG, 128).childOption(ChannelOption.SO_KEEPALIVE, true);
+					}).option(ChannelOption.SO_BACKLOG, 1000000).childOption(ChannelOption.SO_KEEPALIVE, true);
 
 			ChannelFuture f = b.bind(port).sync();
 
