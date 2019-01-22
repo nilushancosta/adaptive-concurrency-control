@@ -4,9 +4,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import io.netty.buffer.ByteBuf;
-
 public class CustomThreadPool {
 
 	private final int KEEP_ALIVE_TIME = 100;

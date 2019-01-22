@@ -40,10 +40,10 @@ public class NettyServer {
 
 						@Override
 						public void initChannel(SocketChannel ch) throws Exception {
-							latencyTimerContext = ThreadPoolSizeModifier.LATENCY_TIMER.time(); // Start Dropwizard metrics timer (latency)
+							latencyTimerContext = ThreadPoolSizeModifier.LATENCY_TIMER.time();
 							ChannelPipeline p = ch.pipeline();
 							p.addLast(new HttpServerCodec());
-							p.addLast("aggregator", new HttpObjectAggregator(1048576));	
+							p.addLast("aggregator", new HttpObjectAggregator(1048576));
 							p.addLast(new NettyServerHandler(test, executingPool, latencyTimerContext));
 						}
 					}).option(ChannelOption.SO_BACKLOG, 1000000).childOption(ChannelOption.SO_KEEPALIVE, true);

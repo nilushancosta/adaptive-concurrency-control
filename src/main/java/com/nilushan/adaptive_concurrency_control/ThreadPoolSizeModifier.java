@@ -61,7 +61,7 @@ public class ThreadPoolSizeModifier implements Runnable {
 		DEC_CHECK_ITR = false;
 		INC_IMPROVED = true;
 		DEC_IMPROVED = true;
-		int resetMemory = 300;
+		resetMemory = 600;
 		AdaptiveConcurrencyControl.LOGGER.info(
 				"Thread pool size, Current 10 Second Throughput, Throughput Difference, In pogress count, Average Latency, 99th percentile Latency"); // First
 																																						// line
@@ -94,10 +94,10 @@ public class ThreadPoolSizeModifier implements Runnable {
 							+ currentInProgressCount + ", " + currentMeanLatency + ", " + current99PLatency); // Log
 																												// metrics
 
-			System.out.println(INC_ITR + "," + INC_CHECK_ITR + "," + DEC_ITR + "," + DEC_CHECK_ITR);
+			//System.out.println(INC_ITR + "," + INC_CHECK_ITR + "," + DEC_ITR + "," + DEC_CHECK_ITR);
 			if (optimizationAlgorithm.equals("T")) { // If Throughput Optimized
 				if ((DEC_ITR == false || (DEC_ITR == true && DEC_IMPROVED == false))
-						&& ((oldTenSecondRate - currentTenSecondRate) / oldTenSecondRate * 100 > 50)) {
+						&& (((oldTenSecondRate - currentTenSecondRate) / oldTenSecondRate) * 100 > 10) && resetMemory != 300) {
 					System.out.println("LOW");
 					Memory current;
 					for (int i = 0; i < metricMemory.size(); i++) {
@@ -131,7 +131,7 @@ public class ThreadPoolSizeModifier implements Runnable {
 					threadPool.incrementPoolSizeBy(10);
 				}
 				if (INC_CHECK_ITR == true && INC_IMPROVED == true) {
-					if (currentTenSecondRate - oldTenSecondRate < oldTenSecondRate * 10 / 100) {
+					if (((currentTenSecondRate - oldTenSecondRate) / oldTenSecondRate ) * 100 < 10) {
 						INC_IMPROVED = false;
 						threadPool.decrementPoolSizeBy(10);
 						incrementLock = 6; // Prevent increments for the next 8 sets of iterations
@@ -164,14 +164,17 @@ public class ThreadPoolSizeModifier implements Runnable {
 					metricMemory.add(new Memory(currentThreadPoolSize, 1, currentTenSecondRate));
 				}
 
-				resetMemory -= 10;
-				if (resetMemory == 0) {
-					metricMemory.clear(); // clear metricMemory every 5 minutes
-					if (currentThreadPoolSize > 1) {
-						threadPool.decrementPoolSizeTo(1);
-					}
-					resetMemory = 300;
-				}
+//				if (HAS_STARTED == true) {
+//					resetMemory -= 10;
+//				}
+//				if (resetMemory == 0) {
+//					metricMemory.clear(); // clear metricMemory every 5 minutes
+//					if (currentThreadPoolSize > 1) {
+//						threadPool.decrementPoolSizeTo(1);
+//						INC_IMPROVED = true;
+//					}
+//					resetMemory = 600;
+//				}
 
 			}
 
@@ -205,7 +208,7 @@ public class ThreadPoolSizeModifier implements Runnable {
 					threadPool.incrementPoolSizeBy(10);
 				}
 				if (INC_CHECK_ITR == true && INC_IMPROVED == true) {
-					if (current99PLatency - old99PLatency < old99PLatency * 10 / 100) {
+					if ((((old99PLatency - current99PLatency) / old99PLatency) * 100) < 5) {
 						INC_IMPROVED = false;
 						threadPool.decrementPoolSizeBy(10);
 						incrementLock = 6; // Lock increments
@@ -215,7 +218,7 @@ public class ThreadPoolSizeModifier implements Runnable {
 					threadPool.decrementPoolSizeBy(10);
 				}
 				if (DEC_CHECK_ITR == true && DEC_IMPROVED == true) {
-					if (currentMeanLatency - oldMeanLatency < oldMeanLatency * 5 / 100) {
+					if ((((old99PLatency - current99PLatency) / old99PLatency) * 100) < 5) {
 						DEC_IMPROVED = false;
 						threadPool.incrementPoolSizeBy(10);
 						decrementLock = 6; // Lock decrements

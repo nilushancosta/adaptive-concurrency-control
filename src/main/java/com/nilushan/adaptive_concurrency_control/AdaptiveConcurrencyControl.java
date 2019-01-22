@@ -21,7 +21,8 @@ public class AdaptiveConcurrencyControl {
 		}
 		String testName = args[0];
 		int initWorkerThreads = Integer.parseInt(args[1]);
-		String optimization = args[2]; // T=Throughput Optimized, M=Mean latency Optimized, 99P=99th Percentile of latency optimized
+		String optimization = args[2]; // T=Throughput Optimized, M=Mean latency Optimized, 99P=99th Percentile of
+										// latency optimized
 		ScheduledExecutorService threadPoolSizeModifier = Executors.newScheduledThreadPool(1); // Create the thread pool
 																								// to run the periodic
 																								// thread count
