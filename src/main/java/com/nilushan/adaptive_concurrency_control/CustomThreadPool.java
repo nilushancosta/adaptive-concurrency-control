@@ -71,7 +71,7 @@ public class CustomThreadPool implements CustomThreadPoolMBean{
 	}
 
 	@Override
-	public void changePoolSize(int n){
+	public void setPoolSize(int n){
 		// assuming fixed size
 		if (n > executor.getCorePoolSize()) {
 			executor.setMaximumPoolSize(n);
