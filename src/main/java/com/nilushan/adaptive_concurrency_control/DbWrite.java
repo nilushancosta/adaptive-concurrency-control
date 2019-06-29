@@ -39,16 +39,14 @@ public class DbWrite implements Runnable {
 }
 	@Override
 	public void run() {
-		Timer.Context throughputTimerContext = ThreadPoolSizeModifier.THROUGHPUT_TIMER.time();
 		ByteBuf buf = null;
 		try {
-			ThreadPoolSizeModifier.IN_PROGRESS_COUNT++;
 			Connection connection = null;
 			PreparedStatement stmt = null;
 			try {
 				connection = DriverManager.getConnection(
-						"jdbc:mysql://127.0.0.1:3306/echoserver?useSSL=false&autoReconnect=true&failOverReadOnly=false&maxReconnects=10",
-						"root", "root");
+						"jdbc:mysql://127.0.0.1:3306/netty?useSSL=false&autoReconnect=true&failOverReadOnly=false&maxReconnects=10",
+						"root", "19249");
 				Timestamp current = Timestamp.from(Instant.now()); // get current timestamp
 				String sql = "INSERT INTO Timestamp (timestamp) VALUES (?)";
 				stmt = connection.prepareStatement(sql);
@@ -73,7 +71,6 @@ public class DbWrite implements Runnable {
 					}
 				}
 			}
-			ThreadPoolSizeModifier.IN_PROGRESS_COUNT--;
 		} catch (Exception e) {
 			AdaptiveConcurrencyControl.LOGGER.error("Exception in DbWrite Run method", e);
 		}
@@ -97,7 +94,6 @@ public class DbWrite implements Runnable {
 			ctx.write(response);
 		}
 		ctx.flush();
-		throughputTimerContext.stop();
 		timerContext.stop(); // Stop Dropwizard metrics timer
 	}
 

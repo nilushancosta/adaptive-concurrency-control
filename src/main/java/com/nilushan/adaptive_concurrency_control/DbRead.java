@@ -42,10 +42,8 @@ public class DbRead implements Runnable {
 
 	@Override
 	public void run() {
-		Timer.Context throughputTimerContext = ThreadPoolSizeModifier.THROUGHPUT_TIMER.time();
 		ByteBuf buf = null;
 		try {
-			ThreadPoolSizeModifier.IN_PROGRESS_COUNT++;
 			Connection connection = null;
 			PreparedStatement stmt = null;
 			ResultSet rs = null;
@@ -54,7 +52,7 @@ public class DbRead implements Runnable {
 				Random randId = new Random();
 				int toRead = randId.nextInt(50000) + 1;
 				connection = DriverManager.getConnection(
-						"jdbc:mysql://127.0.0.1:3306/echoserver?useSSL=false&autoReconnect=true&failOverReadOnly=false&maxReconnects=10",
+						"jdbc:mysql://127.0.0.1:3306/netty?useSSL=false&autoReconnect=true&failOverReadOnly=false&maxReconnects=10",
 						"root", "root");
 				String sql = "SELECT timestamp FROM Timestamp WHERE id=?";
 				stmt = connection.prepareStatement(sql);
@@ -90,7 +88,6 @@ public class DbRead implements Runnable {
 			}
 			String readTimestampStr = readTimestamp.toString() + "\n";
 			buf = Unpooled.copiedBuffer(readTimestampStr.getBytes());
-			ThreadPoolSizeModifier.IN_PROGRESS_COUNT--;
 		} catch (Exception e) {
 			AdaptiveConcurrencyControl.LOGGER.error("Exception in DbRead Run method", e);
 		}
@@ -114,7 +111,6 @@ public class DbRead implements Runnable {
 			ctx.write(response);
 		}
 		ctx.flush();
-		throughputTimerContext.stop();
 		timerContext.stop(); // Stop Dropwizard metrics timer
 
 	}

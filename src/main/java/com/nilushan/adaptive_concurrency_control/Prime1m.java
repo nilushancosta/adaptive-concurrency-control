@@ -37,21 +37,17 @@ public class Prime1m implements Runnable {
 
 	@Override
 	public void run() {
-		Timer.Context throughputTimerContext = ThreadPoolSizeModifier.THROUGHPUT_TIMER.time();
 		ByteBuf buf = null;
 		try {
-			ThreadPoolSizeModifier.IN_PROGRESS_COUNT++;
 			Random rand = new Random();
 			int number = rand.nextInt((1000021) - 1000000 ) + 1000000;  //Generate random integer between 100000 and 100020
 			String resultString = "true";
 			for (int i=2; i<number; i++) {
 				if (number%i == 0) {
 					resultString="false";
-					break;
 				}
 			}
 			buf = Unpooled.copiedBuffer(resultString.getBytes());
-			ThreadPoolSizeModifier.IN_PROGRESS_COUNT--;
 		} catch (Exception e) {
 			AdaptiveConcurrencyControl.LOGGER.error("Exception in Prime1m Run method", e);
 		}
@@ -75,7 +71,6 @@ public class Prime1m implements Runnable {
 			ctx.write(response);
 		}
 		ctx.flush();
-		throughputTimerContext.stop();
 		timerContext.stop(); // Stop Dropwizard metrics timer
 	}
 }

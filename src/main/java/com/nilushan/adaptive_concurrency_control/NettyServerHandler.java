@@ -25,25 +25,23 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
 	private String testName;
 	private CustomThreadPool executingPool;
-	private Timer.Context timerContext;
 
-	public NettyServerHandler(String name, CustomThreadPool pool, Timer.Context tContext) {
+	public NettyServerHandler(String name, CustomThreadPool pool) {
 		this.testName = name;
 		this.executingPool = pool;
-		this.timerContext = tContext;
 	}
 
 	@Override
 	public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) {
-
+		Timer.Context latencyTimerContext = NettyServer.latencyTimer.time();
 		if (testName.equals("Prime1m")) {
-			executingPool.submitTask(new Prime1m(ctx, msg, timerContext));
+			executingPool.submitTask(new Prime1m(ctx, msg, latencyTimerContext));
 		} else if (testName.equals("Prime10m")) {
-			executingPool.submitTask(new Prime10m(ctx, msg, timerContext));
+			executingPool.submitTask(new Prime10m(ctx, msg, latencyTimerContext));
 		} else if (testName.equals("DbWrite")) {
-			executingPool.submitTask(new DbWrite(ctx, msg, timerContext));
+			executingPool.submitTask(new DbWrite(ctx, msg, latencyTimerContext));
 		} else if (testName.equals("DbRead")) {
-			executingPool.submitTask(new DbRead(ctx, msg, timerContext));
+			executingPool.submitTask(new DbRead(ctx, msg, latencyTimerContext));
 		}
 	}
 

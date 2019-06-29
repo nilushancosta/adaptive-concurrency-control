@@ -4,7 +4,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-public class CustomThreadPool {
+public class CustomThreadPool implements CustomThreadPoolMBean{
 
 	private final int KEEP_ALIVE_TIME = 100;
 	private TimeUnit timeUnit = TimeUnit.SECONDS;
@@ -24,7 +24,7 @@ public class CustomThreadPool {
 	/**
 	 * Submits a task to the thread pool
 	 *
-	 * @param task to be executed in the thread pool
+	 * @param worker to be executed in the thread pool
 	 */
 	public void submitTask(Runnable worker) {
 		executor.execute(worker);
@@ -69,5 +69,23 @@ public class CustomThreadPool {
 		executor.setMaximumPoolSize(n);
 		executor.setCorePoolSize(n);
 	}
+
+	@Override
+	public void changePoolSize(int n){
+		// assuming fixed size
+		if (n > executor.getCorePoolSize()) {
+			executor.setMaximumPoolSize(n);
+			executor.setCorePoolSize(n);
+		} else {
+			executor.setCorePoolSize(n);
+			executor.setMaximumPoolSize(n);
+		}
+	}
+
+	@Override
+	public int getPoolSize() {
+		return executor.getPoolSize();
+	}
+
 
 }
