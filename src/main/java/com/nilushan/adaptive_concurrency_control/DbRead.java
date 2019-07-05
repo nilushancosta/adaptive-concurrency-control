@@ -53,7 +53,7 @@ public class DbRead implements Runnable {
 				int toRead = randId.nextInt(50000) + 1;
 				connection = DriverManager.getConnection(
 						"jdbc:mysql://127.0.0.1:3306/netty?useSSL=false&autoReconnect=true&failOverReadOnly=false&maxReconnects=10",
-						"root", "root");
+						"root", "javawso2");
 				String sql = "SELECT timestamp FROM Timestamp WHERE id=?";
 				stmt = connection.prepareStatement(sql);
 				stmt.setInt(1, toRead);
