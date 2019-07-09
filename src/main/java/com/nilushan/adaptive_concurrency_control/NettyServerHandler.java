@@ -1,5 +1,6 @@
 package com.nilushan.adaptive_concurrency_control;
 
+import com.nilushan.adaptive_concurrency_control.tomcat.StandardThreadExecutor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
@@ -24,9 +25,9 @@ import com.codahale.metrics.Timer;
 public class NettyServerHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
 	private String testName;
-	private CustomThreadPool executingPool;
+	private StandardThreadExecutor executingPool;
 
-	public NettyServerHandler(String name, CustomThreadPool pool) {
+	public NettyServerHandler(String name, StandardThreadExecutor pool) {
 		this.testName = name;
 		this.executingPool = pool;
 	}
@@ -35,13 +36,13 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<FullHttpRequ
 	public void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) {
 		Timer.Context latencyTimerContext = NettyServer.latencyTimer.time();
 		if (testName.equals("Prime1m")) {
-			executingPool.submitTask(new Prime1m(ctx, msg, latencyTimerContext));
+			executingPool.execute(new Prime1m(ctx, msg, latencyTimerContext));
 		} else if (testName.equals("Prime10m")) {
-			executingPool.submitTask(new Prime10m(ctx, msg, latencyTimerContext));
+			executingPool.execute(new Prime10m(ctx, msg, latencyTimerContext));
 		} else if (testName.equals("DbWrite")) {
-			executingPool.submitTask(new DbWrite(ctx, msg, latencyTimerContext));
+			executingPool.execute(new DbWrite(ctx, msg, latencyTimerContext));
 		} else if (testName.equals("DbRead")) {
-			executingPool.submitTask(new DbRead(ctx, msg, latencyTimerContext));
+			executingPool.execute(new DbRead(ctx, msg, latencyTimerContext));
 		}
 	}
 

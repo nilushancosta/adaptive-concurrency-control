@@ -1,10 +1,11 @@
 package com.nilushan.adaptive_concurrency_control.tomcat;
 
+import javax.management.StandardMBean;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class StandardThreadExecutor implements Executor, ResizableExecutor {
-    
+public class StandardThreadExecutor implements Executor, ResizableExecutor, StandardThreadExecutorMBean {
+
     // ---------------------------------------------- Properties
     /**
      * Default thread priority
@@ -209,6 +210,7 @@ public class StandardThreadExecutor implements Executor, ResizableExecutor {
         return (executor != null) ? executor.getCompletedTaskCount() : 0;
     }
 
+    @Override
     public int getCorePoolSize() {
         return (executor != null) ? executor.getCorePoolSize() : 0;
     }
@@ -232,7 +234,9 @@ public class StandardThreadExecutor implements Executor, ResizableExecutor {
         if (executor == null)
             return false;
 
+        minSpareThreads = corePoolSize;
         executor.setCorePoolSize(corePoolSize);
+        maxThreads = maximumPoolSize;
         executor.setMaximumPoolSize(maximumPoolSize);
         return true;
     }

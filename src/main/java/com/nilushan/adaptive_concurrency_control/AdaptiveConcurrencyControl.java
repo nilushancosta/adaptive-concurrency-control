@@ -7,6 +7,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.SlidingTimeWindowArrayReservoir;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.jmx.JmxReporter;
+import com.nilushan.adaptive_concurrency_control.tomcat.StandardThreadExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,15 +21,24 @@ public class AdaptiveConcurrencyControl {
 
 	public static void main(String[] args) throws Exception {
 		if (args.length != 3) {
-			LOGGER.error("Arguments not found! Please specify the 3 arguments <TestName> <initialWorkerPoolCount> <Metric Window Size>");
+			LOGGER.error("Arguments not found! Please specify the 3 arguments <TestName> <fixed_pool_size or 'tomcat'> <Metric Window Size>");
 			System.exit(-1);
 		}
 
-		String testName = args[0];
-		int initWorkerThreads = Integer.parseInt(args[1]);
-		int windowSize = Integer.parseInt(args[2]);
+		// Start tomcat executor with default configurations
+		StandardThreadExecutor threadPool = new StandardThreadExecutor();
 
-		CustomThreadPool thirdThreadPool = new CustomThreadPool(initWorkerThreads);
+		String testName = args[0];
+
+		// check whether the test is for a fixed pool size
+		if (!args[1].equalsIgnoreCase("tomcat")){
+			// if for a fixed pool size, set the thread pool size of tomcat executor to that fixed value
+			// note - we can make the tomcat executor a fixed executor by making corePoolSize = macThreads
+			int fixedPoolSize = Integer.parseInt(args[1]);
+			threadPool.resizePool(fixedPoolSize, fixedPoolSize);
+		}
+
+		int windowSize = Integer.parseInt(args[2]);
 
 		// Dropwizard metrics
 		MetricRegistry metricRegistry = new MetricRegistry();
@@ -39,10 +49,10 @@ public class AdaptiveConcurrencyControl {
 		jmxReporter.start();
 
 		MBeanServer server = ManagementFactory.getPlatformMBeanServer();
-		ObjectName rbeName = new ObjectName("thirdThreadPool:type=CustomThreadPool");
-		server.registerMBean(thirdThreadPool, rbeName);
+		ObjectName threadPoolName = new ObjectName("threadPool:type=StandardThreadExecutor");
+		server.registerMBean(threadPool, threadPoolName);
 
-		new NettyServer(PORT, testName, thirdThreadPool, latencyTimer).start();
+		new NettyServer(PORT, testName, threadPool, latencyTimer).start();
 
 	}
 }

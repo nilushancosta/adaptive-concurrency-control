@@ -3,9 +3,7 @@ package com.nilushan.adaptive_concurrency_control;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
-import java.math.BigInteger;
 import java.util.Random;
-import java.util.concurrent.Callable;
 
 import com.codahale.metrics.Timer;
 
