@@ -1,4 +1,4 @@
-package com.nilushan.adaptive_concurrency_control;
+package org.wso2.adaptive_concurrency_control;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;

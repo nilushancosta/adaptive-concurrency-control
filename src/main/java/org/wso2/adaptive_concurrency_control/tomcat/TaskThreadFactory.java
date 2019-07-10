@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nilushan.adaptive_concurrency_control.tomcat;
+package org.wso2.adaptive_concurrency_control.tomcat;
 
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;

@@ -1,4 +1,4 @@
-package com.nilushan.adaptive_concurrency_control;
+package org.wso2.adaptive_concurrency_control;
 
 import java.lang.management.ManagementFactory;
 import java.util.concurrent.TimeUnit;
@@ -7,7 +7,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.SlidingTimeWindowArrayReservoir;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.jmx.JmxReporter;
-import com.nilushan.adaptive_concurrency_control.tomcat.StandardThreadExecutor;
+import org.wso2.adaptive_concurrency_control.tomcat.StandardThreadExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +53,7 @@ public class AdaptiveConcurrencyControl {
 		server.registerMBean(threadPool, threadPoolName);
 
 		new NettyServer(PORT, testName, threadPool, latencyTimer).start();
+		LOGGER.info("Server started listening at port " + PORT);
 
 	}
 }

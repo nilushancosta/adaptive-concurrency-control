@@ -1,11 +1,9 @@
-package com.nilushan.adaptive_concurrency_control;
+package org.wso2.adaptive_concurrency_control;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
-import java.math.BigInteger;
 import java.util.Random;
-import java.util.concurrent.Callable;
 
 import com.codahale.metrics.Timer;
 
@@ -23,13 +21,13 @@ import io.netty.handler.codec.http.HttpUtil;
 /**
  * Test to measure performance of Primality check
  */
-public class Prime100k implements Runnable {
+public class Prime1m implements Runnable {
 
 	private FullHttpRequest msg;
 	private ChannelHandlerContext ctx;
 	private Timer.Context timerContext;
 
-	public Prime100k(ChannelHandlerContext ctx, FullHttpRequest msg, Timer.Context timerCtx) {
+	public Prime1m(ChannelHandlerContext ctx, FullHttpRequest msg, Timer.Context timerCtx) {
 		this.msg = msg;
 		this.ctx = ctx;
 		this.timerContext = timerCtx;
@@ -40,7 +38,7 @@ public class Prime100k implements Runnable {
 		ByteBuf buf = null;
 		try {
 			Random rand = new Random();
-			int number = rand.nextInt((100021) - 100000 ) + 100000;  //Generate random integer between 100000 and 100020
+			int number = rand.nextInt((1000021) - 1000000 ) + 1000000;  //Generate random integer between 100000 and 100020
 			String resultString = "true";
 			for (int i=2; i<number; i++) {
 				if (number%i == 0) {
@@ -49,7 +47,7 @@ public class Prime100k implements Runnable {
 			}
 			buf = Unpooled.copiedBuffer(resultString.getBytes());
 		} catch (Exception e) {
-			AdaptiveConcurrencyControl.LOGGER.error("Exception in Prime520 Run method", e);
+			AdaptiveConcurrencyControl.LOGGER.error("Exception in Prime1m Run method", e);
 		}
 		
 		boolean keepAlive = HttpUtil.isKeepAlive(msg);

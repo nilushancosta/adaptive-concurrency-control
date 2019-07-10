@@ -27,7 +27,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>com.nilushan.adaptive_concurrency_control.AdaptiveConcurrencyControl</mainClass>
+                  <mainClass>org.wso2.adaptive_concurrency_control.AdaptiveConcurrencyControl</mainClass>
                 </transformer>
               </transformers>
             </configuration>

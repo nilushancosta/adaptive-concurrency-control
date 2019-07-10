@@ -1,4 +1,4 @@
-package com.nilushan.adaptive_concurrency_control;
+package org.wso2.adaptive_concurrency_control;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
@@ -8,7 +8,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.concurrent.Callable;
 
 import com.codahale.metrics.Timer;
 
@@ -46,7 +45,7 @@ public class DbWrite implements Runnable {
 			try {
 				connection = DriverManager.getConnection(
 						"jdbc:mysql://127.0.0.1:3306/netty?useSSL=false&autoReconnect=true&failOverReadOnly=false&maxReconnects=10",
-						"root", "javawso2");
+						"root", "19249");
 				Timestamp current = Timestamp.from(Instant.now()); // get current timestamp
 				String sql = "INSERT INTO Timestamp (timestamp) VALUES (?)";
 				stmt = connection.prepareStatement(sql);

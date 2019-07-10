@@ -1,6 +1,5 @@
-package com.nilushan.adaptive_concurrency_control.tomcat;
+package org.wso2.adaptive_concurrency_control.tomcat;
 
-import javax.management.StandardMBean;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 

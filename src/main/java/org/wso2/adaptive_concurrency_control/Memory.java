@@ -1,4 +1,4 @@
-package com.nilushan.adaptive_concurrency_control;
+package org.wso2.adaptive_concurrency_control;
 
 public class Memory {
 	

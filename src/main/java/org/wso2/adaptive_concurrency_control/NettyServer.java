@@ -1,8 +1,8 @@
-package com.nilushan.adaptive_concurrency_control;
+package org.wso2.adaptive_concurrency_control;
 
 import com.codahale.metrics.Timer;
 
-import com.nilushan.adaptive_concurrency_control.tomcat.StandardThreadExecutor;
+import org.wso2.adaptive_concurrency_control.tomcat.StandardThreadExecutor;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;

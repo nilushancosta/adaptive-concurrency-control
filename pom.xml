@@ -78,7 +78,7 @@
 					<!--<archive>-->
 						<!--<manifest>-->
 							<!--<addClasspath>true</addClasspath>-->
-							<!--<mainClass>com.nilushan.adaptive_concurrency_control.AdaptiveConcurrencyControl</mainClass>-->
+							<!--<mainClass>AdaptiveConcurrencyControl</mainClass>-->
 						<!--</manifest>-->
 					<!--</archive>-->
 				<!--</configuration>-->
@@ -88,7 +88,7 @@
 				<!--<configuration>-->
 					<!--<archive>-->
 						<!--<manifest>-->
-							<!--<mainClass>com.nilushan.adaptive_concurrency_control.AdaptiveConcurrencyControl</mainClass>-->
+							<!--<mainClass>AdaptiveConcurrencyControl</mainClass>-->
 						<!--</manifest>-->
 					<!--</archive>-->
 					<!--<descriptorRefs>-->
@@ -117,7 +117,7 @@
 						<configuration>
 							<transformers>
 								<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>com.nilushan.adaptive_concurrency_control.AdaptiveConcurrencyControl</mainClass>
+									<mainClass>org.wso2.adaptive_concurrency_control.AdaptiveConcurrencyControl</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>
